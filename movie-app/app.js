@@ -7,7 +7,8 @@ const app = express();
 
 // middleware 
 app.use('/graphql', expressGraphql({
-    schema
+    schema,
+    graphiql: true
 }));
 
 app.listen(5000, () => {
