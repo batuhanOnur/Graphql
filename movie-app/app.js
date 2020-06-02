@@ -5,6 +5,13 @@ const schema = require('./schema/schema');
 
 const app = express();
 
+
+// dotenv
+require('dotenv').config();
+
+//db
+const db = require('./helpers/db')();
+
 // middleware 
 app.use('/graphql', expressGraphql({
     schema,
