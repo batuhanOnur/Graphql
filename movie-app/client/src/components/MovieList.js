@@ -1,46 +1,108 @@
 import React, { Component } from 'react';
-
-// apollo
-import { gql } from 'apollo-boost';
 import { Query } from 'react-apollo';
 
+// queries
+import { getMoviesQuery, getMovieQuery } from '../queries/queries';
 
-const getMoviesQuery = gql`
-
-    {
-        movies{
-            id,
-            title,
-            description
-        }
-    }
-
-`;
+import { Button, Modal } from 'antd';
+import 'antd/dist/antd.css';
 
 class MovieList extends Component {
+    state = {
+        visible: false,
+        activeId: ''
+    };
 
+    showModal = id => {
+        this.setState({
+            visible: true,
+            activeId: id
+        });
+    };
+
+    handleOk = (e) => {
+        this.setState({
+            visible: false,
+        });
+    };
+
+    handleCancel = (e) => {
+        this.setState({
+            visible: false,
+        });
+    };
 
     render() {
         return (
-            <div>
-                <ul className="movie-list">
-                    <Query query={getMoviesQuery}>
-                        {({ loading, error, data }) => {
+            <div className="container" data-state="Movie App">
 
-                            if (loading) return <div>Loading...</div>
-                            if (error) return <div>Error.</div>
+                <Modal
+                    title="Detail"
+                    visible={this.state.visible}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                    footer={[
+                        <Button key="submit" type="primary" onClick={this.handleOk}>
+                            OK
+						</Button>,
+                    ]}
+                >
 
-                            return data.movies.map(movie => (
-                                <li key={movie.id}>
-                                    {movie.title}
-                                </li>
-                            ))
+                    <div>
+                        <Query
+                            query={getMovieQuery}
+                            variables={{ id: this.state.activeId }}>
 
-                        }}
-                    </Query>
-                </ul>
+                            {({ loading, error, data }) => {
+                                if (loading) return <div>Loading...</div>;
+                                if (error) return <div>Error.</div>;
+
+                                return <div>
+                                    <h3>{data.movie.title}</h3>
+                                    <p>{data.movie.year}</p>
+                                    <p>{data.movie.description}</p>
+                                    <br />
+                                    <h4>{data.movie.director.name}</h4>
+
+                                    <ul className="director-list">
+                                        {
+                                            data.movie.director.movies.map(movie => (
+                                                <li key={movie.id}>
+                                                    <div className="bg"></div>
+                                                    <div className="title">{movie.title}</div>
+                                                </li>
+                                            ))
+                                        }
+                                    </ul>
+                                </div>
+                            }}
+                        </Query>
+                    </div>
+                </Modal>
+
+                <div className="device" data-view="list">
+                    <ul className="movie-list layer" data-layer="list">
+                        <Query query={getMoviesQuery}>
+                            {({ loading, error, data }) => {
+                                if (loading) return <div>Loading...</div>;
+                                if (error) return <div>Error.</div>;
+
+                                return data.movies.map(({ id, title, description }) => (
+                                    <li className="content" key={id} onClick={() => {
+                                        this.showModal(id)
+                                    }}>
+                                        <div className="bg"></div>
+                                        <div className="avatar"></div>
+                                        <div className="title">{title}</div>
+                                        <p>{description}</p>
+                                    </li>
+                                ))
+                            }}
+                        </Query>
+                    </ul>
+                </div>
             </div>
-        )
+        );
     }
 }
 

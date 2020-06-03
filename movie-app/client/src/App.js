@@ -6,7 +6,7 @@ import { ApolloProvider } from 'react-apollo';
 
 //components
 import MovieList from './components/MovieList';
-
+import NewMovieList from './components/NewMovieForm';
 
 
 
@@ -19,6 +19,7 @@ function App() {
 
     <ApolloProvider client={client}>
       <div className="App">
+        <NewMovieList />
         <MovieList />
       </div>
     </ApolloProvider>
